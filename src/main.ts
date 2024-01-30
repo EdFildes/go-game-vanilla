@@ -1,22 +1,15 @@
-import { TestGame } from "./TestGame.js";
+import express from "express";
 
+const app = express();
+const port = 3000;
 
-const game = new TestGame(8)
+app.set("views", "./views");
+app.set("view engine", "pug");
 
-game.setCurrentColor("O")
-game.setFixColor(true);
-console.log("new click")
-game.simulateClick([3, 4]);
-console.log("new click")
-game.simulateClick([2, 5]);
-console.log("new click")
-game.simulateClick([3, 6]);
-game.setCurrentColor("X")
-console.log("new click")
-game.simulateClick([3, 5]);
-game.setCurrentColor("O")
-console.log("new click")
-game.simulateClick([4, 5]);
+app.get("/", (req, res) => {
+  res.render("index", { title: "Hey", message: "Hello there!" });
+});
 
-//game.printGroups(true)
-console.log(game.printBoard())
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
