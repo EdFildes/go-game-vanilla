@@ -1,0 +1,25 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(8, calc(90vw / 8));
+  grid-template-rows: repeat(8, calc(50vh / 8));
+  border: solid black 20px;
+  width: min-content;
+}
+
+.empty {
+  background: no-repeat url("img/empty.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.white {
+  background: no-repeat url("img/white.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.black {
+  background: no-repeat url("img/black.jpg");
+  background-size: cover;
+  background-position: center;
+}

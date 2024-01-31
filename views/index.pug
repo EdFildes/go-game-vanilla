@@ -1,5 +1,19 @@
 html
   head
     title= title
+    script(src='./script.js')
+    style
+      include style.css
   body
     h1= message
+    div.grid
+      each row, rowNum in positions 
+        each square, colNum in row 
+          if square === "-"
+            div.empty(onclick=`makeMove("${[rowNum, colNum]}")`)
+          else if square === "O"
+            div.white
+          else if square === "X"
+            div.black
+        
+        

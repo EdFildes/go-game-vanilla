@@ -25,7 +25,10 @@ export class TestGame extends Game {
   printBoard() {
     const boardIllustration: string[] = [];
     this.groupsHandler.groupLocations.forEach((row: Row) => {
-      const mappedRow = row.map((id) => this.groupsHandler.getGroupColor(id));
+      const mappedRow = row.map((id) => {
+        const group = this.groupsHandler.groupLookup(id)
+        return group.color
+      });
       boardIllustration.push(mappedRow.join(" "));
     });
     return boardIllustration.join("\n");
@@ -41,6 +44,5 @@ export class TestGame extends Game {
       if (!this.fixColor)
         this.currentColor = this.currentColor === "O" ? "X" : "O";
     }
-    console.log(this.printBoard());
   }
 }

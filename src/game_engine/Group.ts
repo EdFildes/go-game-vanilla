@@ -16,7 +16,7 @@ export const Group = class {
 
   constructor(
     groupsHandler: GroupsHandlerInstance,
-    position: Position,
+    members: Members, 
     color: Color,
     id: number,
     liberties: number,
@@ -26,8 +26,7 @@ export const Group = class {
     this.color = color;
     this.id = id;
     this.liberties = liberties;
-    const [row, col] = position;
-    this.members.push([row, col]);
+    this.members.concat(members);
     this.libertyTally = libertyTally;
   }
 
@@ -48,14 +47,6 @@ export const Group = class {
         : quantity;
     }
   };
-
-  setLiberties(quantity: number) {
-    this.liberties = quantity;
-  }
-
-  setMembers(members: Members) {
-    this.members = members;
-  }
 
   addMember = (position: Position) => {
     const [row, col] = position;
