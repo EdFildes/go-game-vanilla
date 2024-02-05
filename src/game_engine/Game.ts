@@ -36,7 +36,7 @@ export class Game {
 
         // debug info
         Object.values(this.groupsHandler.groupLookup).forEach(group => {
-          console.log("group: ", group.id, " liberties: ", group.liberties)
+          console.log("group: ", group.id, " liberties: ", group.liberties, " occupations: ", group.occupations)
         })
         this.groupsHandler.groupLocations.forEach((row: Row) => console.log(row.join(" ")));
       }

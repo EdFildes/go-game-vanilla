@@ -9,30 +9,30 @@ export const handleFriendlies = (
 ) => {
   // get list of unique friendly neighbouring ids
   const friendlyNeighbouringGroups = getUniqueGroups(neighbours, "FRIENDLY")
+  const { liberties, occupations } = getLiberties(neighbours);
 
   let groupId;
-  const { liberties, libertyTally } = getLiberties(neighbours);
 
   if(friendlyNeighbouringGroups.size === 0){  // create a solo group 
-    groupId = groupsHandler.createNewGroup([position], liberties, libertyTally);
+    groupId = groupsHandler.createNewGroup([position], liberties, occupations);
   } else {
     Array.from(friendlyNeighbouringGroups).forEach((groupId) => {
       const group = groupsHandler.groupLookup[groupId];
-      group.removeLiberties(1);
+      group.removeLiberties([position]);
     });
   }
 
   if (friendlyNeighbouringGroups.size === 1) { // join the neighbouring group
     groupId = friendlyNeighbouringGroups.values().next().value;
-    groupsHandler.joinExistingGroup(position, groupId, neighbours);
+    const { liberties, occupations } = getLiberties(neighbours, groupId);
+    groupsHandler.joinExistingGroup(position, groupId, liberties, occupations);
   } else if (friendlyNeighbouringGroups.size > 1) {
-    groupId = groupsHandler.createNewGroup([position], liberties, libertyTally);
+    const { liberties, occupations } = getLiberties(neighbours);
+    groupId = groupsHandler.createNewGroup([position], liberties, occupations);
     groupId = groupsHandler.bridgeGroups([
       ...Array.from(friendlyNeighbouringGroups),
       groupId,
     ]);
-
-    console.log(groupId, "joined")
   } 
 
   return groupId;

@@ -8,15 +8,16 @@ export type Row = Square[];
 export type GroupLookup = Record<number, any>; // wierd error then doing typeof Group
 export type BoardInstance = typeof Board;
 export type GroupsHandlerInstance = any; //typeof GroupsHandler;
+export type GroupInstance = any;
 export type GameInstance = any; // typeof Game
-export type Members = Array<[number, number]>;
+export type Members = Position[]
 export type LibertyTally = Record<number, number>;
 
 export type PositionState = "EMPTY" | "FRIENDLY" | "UNFRIENDLY"
 
 export interface NeighbourProps {
   type: PositionState;
-  liberties: number;
-  groupId: number;
+  groupInstance: GroupInstance;
   neighbouringGroups: number[];
+  position: Position;
 }

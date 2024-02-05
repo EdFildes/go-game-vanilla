@@ -1,7 +1,7 @@
+import { without } from "ramda";
 import {
   Color,
   GroupsHandlerInstance,
-  LibertyTally,
   Members,
   Position,
 } from "./types.js";
@@ -9,42 +9,42 @@ import {
 export const Group = class {
   readonly color: Color;
   readonly id: number;
-  liberties: number;
+  liberties: Position[]
   members: Members = [];
   groupsHandler: GroupsHandlerInstance;
-  libertyTally: Record<number, number> = {};
+  occupations: Record<number, Position[]> = {};
 
   constructor(
     groupsHandler: GroupsHandlerInstance,
     members: Members, 
     color: Color,
     id: number,
-    liberties: number,
-    libertyTally: LibertyTally,
+    liberties: Position[],
+    occupations: Record<number, Position[]>,
   ) {
     this.groupsHandler = groupsHandler;
     this.color = color;
     this.id = id;
     this.liberties = liberties;
-    this.members.concat(members);
-    this.libertyTally = libertyTally;
+    this.members = this.members.concat(members);
+    this.occupations = occupations;
   }
 
-  addLiberties(quantity: number) {
-    this.liberties += quantity;
+  addLiberties(liberties: Position[]) {
+    this.liberties = this.liberties.concat(liberties);
   }
 
   refundLiberties(groupId: number) {
-    this.liberties += this.libertyTally[groupId];
-    delete this.libertyTally[groupId];
+    this.liberties = this.liberties.concat(this.occupations[groupId]);
+    delete this.occupations[groupId];
   }
 
-  removeLiberties = (quantity: number, groupId?: number) => {
-    this.liberties -= quantity;
-    if (groupId) {
-      this.libertyTally[groupId] = this.libertyTally[groupId]
-        ? this.libertyTally[groupId] + quantity
-        : quantity;
+  removeLiberties = (liberties: Position[], groupId: number) => {
+    this.liberties = without(liberties, this.liberties);
+    if(typeof groupId === "number"){
+      this.occupations[groupId] = Array.isArray(this.occupations[groupId]) ? 
+      this.occupations[groupId].concat(liberties) : 
+      liberties
     }
   };
 

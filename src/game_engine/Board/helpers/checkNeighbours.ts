@@ -52,8 +52,8 @@ export const checkNeighbours = (
     const group = groupsHandler.groupLookup[groupId];
     return {
       type: getType(groupId, groupsHandler, game.currentColor),
-      groupId: groupId === "-" ? null : groupId,
-      liberties: group ? group.liberties : null,
+      groupInstance: group,
+      position: adjPosition,
       neighbouringGroups: getNeighbouringGroups(groupsHandler, adjPosition, game).map(group => group[1]).filter(id => typeof id === "number")
     };
   })

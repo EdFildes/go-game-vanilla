@@ -18,8 +18,8 @@ export const Board = class {
 
     const canMove = neighbours.some(neighbour => 
       neighbour.type === "EMPTY" || 
-      (neighbour.type === "FRIENDLY" && neighbour.liberties > 1) || 
-      (neighbour.type === "UNFRIENDLY" && neighbour.liberties === 1)
+      (neighbour.type === "FRIENDLY" && neighbour.groupInstance.liberties.length > 1) || 
+      (neighbour.type === "UNFRIENDLY" && neighbour.groupInstance.liberties.length === 1)
     )
 
     if(canMove){
@@ -28,7 +28,7 @@ export const Board = class {
       // neighbours may have changed by this point due to groups being merged
       neighbours = checkNeighbours(this.groupsHandler, position, this.game);
 
-      handleUnfriendlies(neighbours, this.groupsHandler, groupId);
+      handleUnfriendlies(neighbours, this.groupsHandler, position, groupId);
 
       removeSurroundedGroups(neighbours, this.groupsHandler);
 

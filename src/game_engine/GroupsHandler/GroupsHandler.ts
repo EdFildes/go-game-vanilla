@@ -4,11 +4,9 @@ import {
   GameInstance,
   GroupLocations,
   GroupLookup,
-  LibertyTally,
-  NeighbourProps,
   Position,
 } from "../types.js";
-import {mergeWith, add} from "ramda";
+import {mergeWith, add, uniq, concat} from "ramda";
 import { getLiberties } from "./helpers/getLiberties.js";
 
 export const GroupsHandler = class {
@@ -24,8 +22,8 @@ export const GroupsHandler = class {
 
   createNewGroup(
     members: Position[],
-    liberties: number,
-    libertyTally: LibertyTally
+    liberties: Position[],
+    occupations: Record<number, Position[]>
   ) {
     this.groupLookup[this.id] = new Group(
       this,
@@ -33,7 +31,7 @@ export const GroupsHandler = class {
       this.gameInstance.currentColor,
       this.id,
       liberties,
-      libertyTally,
+      occupations,
     );
     members.forEach(position => {
       const [row, col] = position;
@@ -45,13 +43,13 @@ export const GroupsHandler = class {
   joinExistingGroup(
     piecePosition: Position,
     idToJoin: number,
-    neighbours: NeighbourProps[],
+    liberties: Position[],
+    occupations: Position[]
   ) {
-    const { liberties, libertyTally } = getLiberties(neighbours, idToJoin);
     const group = this.groupLookup[idToJoin];
     group.addMember(piecePosition);
     group.addLiberties(liberties);
-    group.libertyTally = mergeWith(add, group.libertyTally, libertyTally)
+    group.occupations = mergeWith(concat, group.occupations, occupations)
     const [rowPiece, colPiece] = piecePosition;
     this.groupLocations[rowPiece][colPiece] = group.id;
   }
@@ -59,26 +57,28 @@ export const GroupsHandler = class {
   bridgeGroups(oldGroupIds: number[]) {
     const members = oldGroupIds.map((id) => this.groupLookup[id].members).flat();
 
-    let liberties = 0
+    let liberties: Position[] = []
     oldGroupIds.forEach(id => 
-      liberties += this.groupLookup[id].liberties
+      liberties = uniq(liberties.concat(this.groupLookup[id].liberties))
     );
 
-    let libertyTally = {}
+    let occupations = {}
     oldGroupIds.forEach(id => {
-      const libertyTallyInner = this.groupLookup[id].libertyTally
-      libertyTally = mergeWith(add,
-        libertyTally,
-        libertyTallyInner
+      const occupationsInner = this.groupLookup[id].occupations
+      occupations = mergeWith(concat,
+        occupations,
+        occupationsInner
       )
     })
-    const newGroupId = this.createNewGroup(members, liberties, libertyTally)
+    const newGroupId = this.createNewGroup(members, liberties, occupations)
 
     // cleanup
     Object.values(this.groupLookup).forEach(group => {
       oldGroupIds.forEach((oldId) => {
-        group.libertyTally[newGroupId] = group.libertyTally[oldId]
-        delete group.libertyTally[oldId]
+        if(group.occupations[oldId]){
+          group.occupations[newGroupId] = group.occupations[oldId]
+          delete group.occupations[oldId]
+        }
       })
     })
     oldGroupIds.forEach((oldId) => delete this.groupLookup[oldId]); 
@@ -92,7 +92,7 @@ export const GroupsHandler = class {
       ([row, col]: Position) => (this.groupLocations[row][col] = "-"),
     );
     Object.values(this.groupLookup).forEach((group) => {
-      if (group.libertyTally[groupId]) {
+      if (group.occupations[groupId]) {
         group.refundLiberties(groupId);
       }
     });
