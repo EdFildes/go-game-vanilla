@@ -1,8 +1,6 @@
+import { getLiberties } from "../GroupsHandler/helpers/getLiberties.js";
 import { GameInstance, GroupsHandlerInstance, Position } from "../types.js";
 import { checkNeighbours } from "./helpers/checkNeighbours.js";
-import { handleFriendlies } from "./helpers/handleFriendlies.js";
-import { handleUnfriendlies } from "./helpers/handleUnfriendlies.js";
-import { removeSurroundedGroups } from "./helpers/removeSurroundedGroups.js";
 
 export const Board = class {
   readonly groupsHandler: GroupsHandlerInstance;
@@ -23,17 +21,24 @@ export const Board = class {
     )
 
     if(canMove){
-      const groupId = handleFriendlies(neighbours, this.groupsHandler, position);
 
-      // neighbours may have changed by this point due to groups being merged
-      neighbours = checkNeighbours(this.groupsHandler, position, this.game);
+      const { liberties, occupations } = getLiberties(neighbours);
+      let groupId = this.groupsHandler.createNewGroup([position], liberties, occupations);
 
-      handleUnfriendlies(neighbours, this.groupsHandler, position, groupId);
-
-      removeSurroundedGroups(neighbours, this.groupsHandler);
+      for(let neighbour of neighbours){
+        if(neighbour.type === "FRIENDLY"){
+          neighbour.groupInstance.removeLiberties([position]);
+          this.groupsHandler.mergeGroups(groupId, neighbour.groupInstance.id);
+        }
+        if(neighbour.type === "UNFRIENDLY"){
+          neighbour.groupInstance.removeLiberties([position], groupId);
+          if (neighbour.groupInstance.liberties.length < 1) {
+            this.groupsHandler.removeGroup(neighbour.groupInstance.id);
+          }
+        }
+      }
 
       return true
-
     } else {
       return false
     }

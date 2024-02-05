@@ -6,8 +6,7 @@ import {
   GroupLookup,
   Position,
 } from "../types.js";
-import {mergeWith, add, uniq, concat} from "ramda";
-import { getLiberties } from "./helpers/getLiberties.js";
+import {mergeWith, uniq, concat} from "ramda";
 
 export const GroupsHandler = class {
   readonly gameInstance: GameInstance;
@@ -41,49 +40,48 @@ export const GroupsHandler = class {
   }
 
   joinExistingGroup(
-    piecePosition: Position,
-    idToJoin: number,
-    liberties: Position[],
-    occupations: Position[]
+    idToJoin: number, 
+    members: Position[], 
+    liberties: Position[], 
+    occupations: Record<number, Position[]>
   ) {
     const group = this.groupLookup[idToJoin];
-    group.addMember(piecePosition);
-    group.addLiberties(liberties);
-    group.occupations = mergeWith(concat, group.occupations, occupations)
-    const [rowPiece, colPiece] = piecePosition;
-    this.groupLocations[rowPiece][colPiece] = group.id;
+    group.members = members;
+    group.liberties = liberties;
+    group.occupations = occupations;
   }
 
-  bridgeGroups(oldGroupIds: number[]) {
-    const members = oldGroupIds.map((id) => this.groupLookup[id].members).flat();
+  mergeGroups(newId: number, oldId: number) {
+    let members: Position[] = [];
+    let liberties: Position[] = [];
+    let occupations = {};
+    
+    [newId, oldId].forEach((id) => {
+      const group = this.groupLookup[id];
 
-    let liberties: Position[] = []
-    oldGroupIds.forEach(id => 
-      liberties = uniq(liberties.concat(this.groupLookup[id].liberties))
-    );
-
-    let occupations = {}
-    oldGroupIds.forEach(id => {
-      const occupationsInner = this.groupLookup[id].occupations
+      members = members.concat(group.members);
+      liberties = uniq(liberties.concat(group.liberties))
       occupations = mergeWith(concat,
         occupations,
-        occupationsInner
+        group.occupations
       )
+    });
+
+    members.forEach(([row, col]) => {
+      this.groupLocations[row][col] = newId
     })
-    const newGroupId = this.createNewGroup(members, liberties, occupations)
+
+    this.joinExistingGroup(newId, members, liberties, occupations)
 
     // cleanup
     Object.values(this.groupLookup).forEach(group => {
-      oldGroupIds.forEach((oldId) => {
-        if(group.occupations[oldId]){
-          group.occupations[newGroupId] = group.occupations[oldId]
-          delete group.occupations[oldId]
-        }
-      })
-    })
-    oldGroupIds.forEach((oldId) => delete this.groupLookup[oldId]); 
+      if(group.occupations[oldId]){
+        group.occupations[newId] = group.occupations[oldId]
+        delete group.occupations[oldId]
+      }
+    });
 
-    return newGroupId
+    delete this.groupLookup[oldId]
   }
 
   removeGroup(groupId: number) {

@@ -39,11 +39,11 @@ export const Group = class {
     delete this.occupations[groupId];
   }
 
-  removeLiberties = (liberties: Position[], groupId: number) => {
+  removeLiberties = (liberties: Position[], unfriendlyGroupId: number) => {
     this.liberties = without(liberties, this.liberties);
-    if(typeof groupId === "number"){
-      this.occupations[groupId] = Array.isArray(this.occupations[groupId]) ? 
-      this.occupations[groupId].concat(liberties) : 
+    if(typeof unfriendlyGroupId === "number"){
+      this.occupations[unfriendlyGroupId] = Array.isArray(this.occupations[unfriendlyGroupId]) ? 
+      this.occupations[unfriendlyGroupId].concat(liberties) : 
       liberties
     }
   };
