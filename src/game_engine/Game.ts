@@ -1,19 +1,31 @@
 import { Board } from "./Board/Board.js";
+import { checkNeighbours } from "./Board/helpers/checkNeighbours.js";
 import { GroupsHandler } from "./GroupsHandler/GroupsHandler.js";
+import { getLiberties } from "./GroupsHandler/helpers/getLiberties.js";
 import { getGroupColor } from "./helpers.js";
 import {
   BoardInstance,
   Color,
   GroupsHandlerInstance,
+  NeighbourProps,
   Position,
   Row,
 } from "./types.js";
 
-const colors: Color[] = ["O", "X"];
+export const colors: Color[] = ["O", "X"];
+
+const debug = (groupsHandler: GroupsHandlerInstance) => {
+  // debug info
+  Object.values(groupsHandler.groupLookup).forEach(group => {
+    console.log("group: ", group.id, " liberties: ", group.liberties, " occupations: ", group.occupations)
+  })
+  groupsHandler.groupLocations.forEach((row: Row) => console.log(row.join(" ")));
+}
+
 
 export class Game {
   readonly size: number;
-  currentColor: Color = "O";
+  currentColor: Color = colors[0];
   readonly boardInstance: BoardInstance;
   readonly groupsHandler: GroupsHandlerInstance;
 
@@ -23,22 +35,43 @@ export class Game {
     this.boardInstance = new Board(this.groupsHandler, this);
   }
 
+  makeMove(position: Position, neighbours: NeighbourProps[]){
+    const { liberties, occupations } = getLiberties(neighbours);
+    let groupId = this.groupsHandler.createNewGroup([position], liberties, occupations);
+
+    for(let neighbour of neighbours){
+      if(neighbour.type === "FRIENDLY"){
+        neighbour.groupInstance.removeLiberties([position]);
+        this.groupsHandler.mergeGroups(groupId, neighbour.groupInstance.id);
+      }
+      if(neighbour.type === "UNFRIENDLY"){
+        neighbour.groupInstance.removeLiberties([position], groupId);
+        if (neighbour.groupInstance.liberties.length < 1) {
+          this.groupsHandler.removeGroup(neighbour.groupInstance.id);
+        }
+      }
+    }
+  }
+
   simulateClick(position: Position) {
     const [row, col] = position;
 
     if (this.groupsHandler.groupLocations[row][col] === "-") {
-      console.log("\n ** new turn...")
-      console.log("current color ", this.currentColor)
-      const hadGo = this.boardInstance.makeMove(position);
-      if(hadGo) {
-        //this.currentColor = colors[colors.indexOf(this.currentColor) & 0];
-        this.currentColor = this.currentColor === "O" ? "X" : "O";
+      
+      console.log("\n ** new turn...\n", "Current color ", this.currentColor)
 
-        // debug info
-        Object.values(this.groupsHandler.groupLookup).forEach(group => {
-          console.log("group: ", group.id, " liberties: ", group.liberties, " occupations: ", group.occupations)
-        })
-        this.groupsHandler.groupLocations.forEach((row: Row) => console.log(row.join(" ")));
+      let neighbours = checkNeighbours(this.groupsHandler, position, this);
+
+      const canMove = neighbours.some(neighbour => 
+        neighbour.type === "EMPTY" || 
+        (neighbour.type === "FRIENDLY" && neighbour.groupInstance.liberties.length > 1) || 
+        (neighbour.type === "UNFRIENDLY" && neighbour.groupInstance.liberties.length === 1)
+      )
+
+      if(canMove){
+        this.makeMove(position, neighbours)
+        this.currentColor = colors[colors.indexOf(this.currentColor) ^ 1];
+        debug(this.groupsHandler)
       }
     }
   }

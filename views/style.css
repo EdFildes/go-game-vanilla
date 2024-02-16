@@ -1,25 +1,50 @@
+.body {
+  background: url("img/background-temp.jpg");
+  background-size: cover;
+  background-position: top;
+}
+
+.title {
+  background: no-repeat url("img/text.png");
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  width: 200px;
+  height: 50px;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(8, calc(90vw / 8));
-  grid-template-rows: repeat(8, calc(50vh / 8));
-  border: solid black 20px;
+  grid-template-columns: repeat(8, calc(90vh / 8));
+  grid-template-rows: repeat(8, calc(90vh / 8));
+  border: solid black 2px;
   width: min-content;
+  background: no-repeat url("img/board.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 .empty {
-  background: no-repeat url("img/empty.jpg");
+  background: no-repeat url("img/empty.png");
   background-size: cover;
   background-position: center;
 }
 
 .white {
-  background: no-repeat url("img/white.jpg");
+  background: no-repeat url("img/white.png");
   background-size: cover;
   background-position: center;
 }
 
 .black {
-  background: no-repeat url("img/black.jpg");
+  background: no-repeat url("img/black.png");
   background-size: cover;
   background-position: center;
 }
