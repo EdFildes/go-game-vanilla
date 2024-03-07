@@ -4,6 +4,7 @@ import { getLiberties } from "./GroupsHandler/helpers/getLiberties.js";
 import { getGroupColor } from "./helpers.js";
 import {
   Color,
+  GroupInstance,
   GroupsHandlerInstance,
   NeighbourProps,
   Position,
@@ -14,7 +15,7 @@ export const colors: Color[] = ["O", "X"];
 
 const debug = (groupsHandler: GroupsHandlerInstance) => {
   // debug info
-  Object.values(groupsHandler.groupLookup).forEach(group => {
+  Object.values(groupsHandler.groupLookup).forEach((group: GroupInstance) => {
     console.log("group: ", group.id, " liberties: ", group.liberties, " occupations: ", group.occupations)
   })
   groupsHandler.groupLocations.forEach((row: Row) => console.log(row.join(" ")));

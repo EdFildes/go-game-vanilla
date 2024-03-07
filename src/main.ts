@@ -26,12 +26,19 @@ app.get("/move", (req, res) => {
     res.render("index", { title, message: "Please start a new game!", size: 0 });
   } else {
     let {position} = req.query
-    position = position.split(",").map(Number)
-    game.simulateClick(position)
-    const positions = game.getPositions()
-    res.render("index", { title, message, size: size, positions}, (err, html) => {
-      res.send({data: html})
-    });
+    if(position && typeof position === "string"){
+      const positionArray = position.split(",").map(Number)
+      game.simulateClick(positionArray)
+      const positions = game.getPositions()
+      res.render("index", { title, message, size: size, positions}, (err, html) => {
+        res.send({data: html})
+      });
+    } else {
+      const positions = game.getPositions()
+      res.render("index", { title, message, size: size, positions}, (err, html) => {
+        res.send({data: html})
+      });
+    }
   }
 });
 
