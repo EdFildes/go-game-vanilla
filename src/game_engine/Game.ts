@@ -1,10 +1,8 @@
-import { Board } from "./Board/Board.js";
 import { checkNeighbours } from "./Board/helpers/checkNeighbours.js";
 import { GroupsHandler } from "./GroupsHandler/GroupsHandler.js";
 import { getLiberties } from "./GroupsHandler/helpers/getLiberties.js";
 import { getGroupColor } from "./helpers.js";
 import {
-  BoardInstance,
   Color,
   GroupsHandlerInstance,
   NeighbourProps,
@@ -26,13 +24,11 @@ const debug = (groupsHandler: GroupsHandlerInstance) => {
 export class Game {
   readonly size: number;
   currentColor: Color = colors[0];
-  readonly boardInstance: BoardInstance;
   readonly groupsHandler: GroupsHandlerInstance;
 
   constructor(size: number) {
     this.size = size;
     this.groupsHandler = new GroupsHandler(this);
-    this.boardInstance = new Board(this.groupsHandler, this);
   }
 
   makeMove(position: Position, neighbours: NeighbourProps[]){

@@ -6,7 +6,6 @@ export type GroupLocations = Array<Row>;
 export type Square = "-" | number;
 export type Row = Square[];
 export type GroupLookup = Record<number, any>; // wierd error then doing typeof Group
-export type BoardInstance = typeof Board;
 export type GroupsHandlerInstance = any; //typeof GroupsHandler;
 export type GroupInstance = any;
 export type GameInstance = any; // typeof Game

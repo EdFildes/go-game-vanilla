@@ -1,4 +1,5 @@
-import { Game } from "./Game";
+import { checkNeighbours } from "./Board/helpers/checkNeighbours";
+import { Game, colors } from "./Game";
 import { Color, Position, Row } from "./types.js";
 
 export class TestGame extends Game {
@@ -38,11 +39,25 @@ export class TestGame extends Game {
     const [row, col] = position;
 
     if (this.groupsHandler.groupLocations[row][col] === "-") {
-      this.boardInstance.makeMove(position);
+      
+      console.log("\n ** new turn...\n", "Current color ", this.currentColor)
 
-      // change to next color
-      if (!this.fixColor)
+      let neighbours = checkNeighbours(this.groupsHandler, position, this);
+
+      const canMove = neighbours.some(neighbour => 
+        neighbour.type === "EMPTY" || 
+        (neighbour.type === "FRIENDLY" && neighbour.groupInstance.liberties.length > 1) || 
+        (neighbour.type === "UNFRIENDLY" && neighbour.groupInstance.liberties.length === 1)
+      )
+
+      if(canMove){
+        this.makeMove(position, neighbours)
+        this.currentColor = colors[colors.indexOf(this.currentColor) ^ 1];
+
+        // change to next color
+        if (!this.fixColor)
         this.currentColor = this.currentColor === "O" ? "X" : "O";
+      }
     }
   }
 }
