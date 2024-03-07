@@ -1,7 +1,11 @@
 FROM node:latest
 
+WORKDIR /usr/app
+COPY . /usr/app
+
 RUN npm i
 RUN npx tsc 
-RUN node ./build/main.js
+
+CMD [ "node","./build/main.js" ] 
 
 EXPOSE 3000
