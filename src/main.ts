@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { Game } from "./game_engine/Game";
 import { GameInstance } from "./game_engine/types";
 
@@ -14,14 +15,19 @@ const title = "Go!!!"
 const message = "Lets play Go!"
 const size = 8
 
-app.get("/", (req, res) => {
+var corsOptions = {
+  origin: 'https://edfildes.co.uk',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.get("/", cors(corsOptions), (req, res) => {
   game = new Game(size);
   const positions = game.getPositions()
   res.render("index", { title, message, size: size, positions });
   console.log("\n !! NEW GAME !!\n")
 });
 
-app.get("/move", (req, res) => {
+app.get("/move", cors(corsOptions), (req, res) => {
   if(!game){
     res.render("index", { title, message: "Please start a new game!", size: 0 });
   } else {
