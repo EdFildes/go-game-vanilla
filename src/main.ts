@@ -14,10 +14,11 @@ let game: GameInstance
 const title = "Go!!!"
 const message = "Lets play Go!"
 const size = 8
+const origin = process.env.ORIGIN
 const root_url = process.env.ROOT_URL
 
 var corsOptions = {
-  origin: process.env.ORIGIN,
+  origin,
   optionsSuccessStatus: 200
 }
 
@@ -37,12 +38,12 @@ app.get(`/move/`, cors(corsOptions), (req, res) => {
       const positionArray = position.split(",").map(Number)
       game.simulateClick(positionArray)
       const positions = game.getPositions()
-      res.render("index", { title, message, size: size, positions, origin: process.env.ORIGIN}, (err, html) => {
+      res.render("index", { title, message, size: size, positions, origin, root_url}, (err, html) => {
         res.send({data: html})
       });
     } else {
       const positions = game.getPositions()
-      res.render("index", { title, message, size: size, positions}, (err, html) => {
+      res.render("index", { title, message, size: size, positions, origin, root_url}, (err, html) => {
         res.send({data: html})
       });
     }
