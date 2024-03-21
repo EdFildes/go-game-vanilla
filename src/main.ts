@@ -17,6 +17,9 @@ const size = 8
 const origin = process.env.ORIGIN
 const root_url = process.env.ROOT_URL
 const path = `${origin}${root_url}`
+console.log("origin: ",origin)
+console.log("root_url: ",root_url)
+console.log("path: ",path)
 
 var corsOptions = {
   origin,
