@@ -38,12 +38,12 @@ app.get(`/move/`, cors(corsOptions), (req, res) => {
       const positionArray = position.split(",").map(Number)
       game.simulateClick(positionArray)
       const positions = game.getPositions()
-      res.render("index", { title, message, size: size, positions, origin, root_url}, (err, html) => {
+      res.render("index", { title, message, size: size, positions, path: `${origin}${root_url}`}, (err, html) => {
         res.send({data: html})
       });
     } else {
       const positions = game.getPositions()
-      res.render("index", { title, message, size: size, positions, origin, root_url}, (err, html) => {
+      res.render("index", { title, message, size: size, positions, path: `${origin}${root_url}`}, (err, html) => {
         res.send({data: html})
       });
     }
