@@ -11,7 +11,7 @@ html
         each row, rowNum in positions 
           each square, colNum in row 
             if square === "-"
-              div.empty(onclick=`makeMove("${[rowNum, colNum]}","${path}")`)
+              div.empty(onclick=`makeMove("${[rowNum, colNum]}","${root_url}")`)
             else if square === "O"
               div.white
             else if square === "X"

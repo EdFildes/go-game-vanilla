@@ -16,7 +16,6 @@ const message = "Lets play Go!"
 const size = 8
 const origin = process.env.ORIGIN
 const root_url = process.env.ROOT_URL
-const path = `${origin}${root_url}`
 
 var corsOptions = {
   origin,
@@ -26,7 +25,7 @@ var corsOptions = {
 app.get(`/`, cors(corsOptions), (req, res) => {
   game = new Game(size);
   const positions = game.getPositions()
-  res.render("index", { title, message, size: size, positions, path });
+  res.render("index", { title, message, size: size, positions, root_url });
   console.log("\n !! NEW GAME !!\n")
 });
 
@@ -39,12 +38,12 @@ app.get(`/move/`, cors(corsOptions), (req, res) => {
       const positionArray = position.split(",").map(Number)
       game.simulateClick(positionArray)
       const positions = game.getPositions()
-      res.render("index", { title, message, size: size, positions, path}, (err, html) => {
+      res.render("index", { title, message, size: size, positions, root_url }, (err, html) => {
         res.send({data: html})
       });
     } else {
       const positions = game.getPositions()
-      res.render("index", { title, message, size: size, positions, path}, (err, html) => {
+      res.render("index", { title, message, size: size, positions, root_url }, (err, html) => {
         res.send({data: html})
       });
     }
